@@ -27,10 +27,10 @@ app.get('/api/restaurants/:id', (req, res) => {
     .then((result) => {
       if (result) {
         res.json(result);
-    } else {
-      res.status(404).json({});
-    }
-  })
+      } else {
+        res.status(404).json({});
+      }
+    })
     .catch((e) => {
       res.status(500).json({
         error: 'Database Error',
@@ -39,12 +39,28 @@ app.get('/api/restaurants/:id', (req, res) => {
 });
 
 app.post('/api/restaurants', (req, res) => {
-  // const { name, distance, stars, category, fav, takeout, visited } = req.body;
-  // console.log(req.body);
   db.one('INSERT INTO restaurant VALUES (DEFAULT, ${name}, ${distance}, ${stars}, ${category}, ${fav}, ${takeout}, ${visited}) RETURNING *', req.body)
   .then((result) => {
     res.status(201).json(result);
   })
 });
 
-app.listen(PORT, () => console.log(`Running: http://localhose:${PORT}`));
+app.delete('/api/restaurants/:id', (req, res) => {
+  // db.oneOrNone('SELECT * FROM restaurant WHERE restaurant.id = $1', req.params.id)
+  db.oneOrNone('DELETE FROM restaurant WHERE restaurant.id = $1', req.params.id)
+  .then((result) => {
+    console.log(result)
+    if (result) {
+      res.status(204).json(result);
+    } else {
+      res.status(404).json({});
+    } 
+  })
+  .catch((e) => {
+    res.status(500).json({
+      error: 'Database Error',
+    });
+  });
+})
+
+app.listen(PORT, () => console.log(`Running: http://localhost:${PORT}`));
