@@ -58,13 +58,14 @@ app.put('/api/restaurants/:id&:distance', (req, res) => {
 })
 
 // Delete a restaurant 
-app.delete('/api/restaurants/:id', (req, res) => {
-  db.oneOrNone('SELECT * FROM restaurant WHERE restaurant.id = $1', req.params.id)
+app.delete('/api/restaurants/:restaurant_name', (req, res) => {
+  console.log(req)
+  db.oneOrNone('SELECT * FROM restaurant WHERE restaurant_name = $1', req.params.restaurant_name)
   .then((result) => {
     console.log(result)
     if (result) {
       res.status(200).json(result);
-      db.oneOrNone('DELETE FROM restaurant WHERE restaurant.id = $1', req.params.id)
+      db.oneOrNone('DELETE FROM restaurant WHERE restaurant.restaurant_name = $1', req.params.restaurant_name)
     } else {
       res.status(404).json({});
     } 
