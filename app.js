@@ -18,7 +18,7 @@ const db = pgp(config);
 
 // Get full list of restaurants
 app.get('/api/restaurants', (req, res) => {
-  db.query('SELECT * FROM restaurant').then((results) => {
+  db.query('SELECT * FROM restaurant ORDER BY id ASC').then((results) => {
     res.json(results);
   });
 }); 
@@ -55,6 +55,11 @@ app.put('/api/restaurants/:id&:distance', (req, res) => {
       .then((result) => {
           res.status(201).json(result);
       })
+      .catch((e) => {
+        res.status(500).json({
+          error: 'Database Error',
+        });
+      });
 })
 
 // Delete a restaurant 
