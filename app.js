@@ -16,12 +16,14 @@ const config = {
 };
 const db = pgp(config);
 
+// Get full list of restaurants
 app.get('/api/restaurants', (req, res) => {
   db.query('SELECT * FROM restaurant').then((results) => {
     res.json(results);
   });
 }); 
 
+// Get specific restaurant by ID
 app.get('/api/restaurants/:id', (req, res) => {
   db.oneOrNone('SELECT * FROM restaurant WHERE restaurant.id = $1', req.params.id)
     .then((result) => {
@@ -38,6 +40,7 @@ app.get('/api/restaurants/:id', (req, res) => {
     });
 });
 
+// Add a new restaurant
 app.post('/api/restaurants', (req, res) => {
   db.one('INSERT INTO restaurant VALUES (DEFAULT, ${name}, ${distance}, ${stars}, ${category}, ${fav}, ${takeout}, ${visited}) RETURNING *', req.body)
   .then((result) => {
@@ -45,13 +48,23 @@ app.post('/api/restaurants', (req, res) => {
   })
 });
 
+// Update a restaurant 
+app.put('/api/restaurants/:id&:distance', (req, res) => {
+  console.log(req.body);
+  db.result('update restaurant set distance = ${distance} WHERE id = ${id} returning *', req.params)
+      .then((result) => {
+          res.status(201).json(result);
+      })
+})
+
+// Delete a restaurant 
 app.delete('/api/restaurants/:id', (req, res) => {
-  // db.oneOrNone('SELECT * FROM restaurant WHERE restaurant.id = $1', req.params.id)
-  db.oneOrNone('DELETE FROM restaurant WHERE restaurant.id = $1', req.params.id)
+  db.oneOrNone('SELECT * FROM restaurant WHERE restaurant.id = $1', req.params.id)
   .then((result) => {
     console.log(result)
     if (result) {
-      res.status(204).json(result);
+      res.status(200).json(result);
+      db.oneOrNone('DELETE FROM restaurant WHERE restaurant.id = $1', req.params.id)
     } else {
       res.status(404).json({});
     } 
